@@ -39,4 +39,4 @@ router.route('/').get((req,res) =>{
     .catch(err => res.status(400).json("Erro: "+ err)) 
   })
 
-module.exports = router
+module.exports = router;
