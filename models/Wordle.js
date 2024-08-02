@@ -4,14 +4,20 @@ const { Schema } = mongoose;
 //create schema object
 
 const wordleSchema = new Schema ({
-    name:{
+    username:{
+        type:String,
+    },
+    useremail:{
         type:String,
     },
     wordlescore:{
+        type:String,
+    },
+    createdAt: {
         type:String,
     },
 },{
     collection: 'Wordle'
 })
 
-module.exports = mongoose.model('wordle', wordleSchema)
+module.exports = mongoose.model('Wordle', wordleSchema)

@@ -1,11 +1,36 @@
 const express = require('express');
-const app = express();
 const cors = require('cors');
-const port = 5001;
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const morgan = require('morgan');
+const app = express();
+const port = 5001;
+const multer = require('multer');
 
-const uri = 'mongodb+srv://admin:fCSRvxosWWKRgzYK@cluster0.npxurqz.mongodb.net/Wordgamle?retryWrites=true&w=majority';
+//Express Data
+
+const wordledata = require('./routes/wordlescores');
+const userdata = require('./routes/useroute');
+
+const filesdata = require('./routes/filesroute')
+
+
+
+
+
+
+//Middleware
+
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({
+  extended:true
+}))
+app.use(express.json());
+app.use(express.static('public'));
+app.use(morgan('dev'));
+
+
+const uri = 'mongodb+srv://admin:fCSRvxosWWKRgzYK@cluster0.npxurqz.mongodb.net/Wordlegame?retryWrites=true&w=majority';
 mongoose.connect(uri)
 .then(() =>console.log('connected successfully'))
 .catch((err) => {console.error(err);})
@@ -14,25 +39,38 @@ connection.once('open',()=>{
   console.log("Mongoose database Connected Successfully");
 })
 
+//Image Storage
 
-//Middleware
+
+
+//apply cors
 app.use(cors());
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({
-  extended:true
-}))
-app.use(express.json());
 
-
-
-const wordledata = require('./routes/wordlescores');
-
+//localhost:5001/emp/create-employee-> frontend entpoint
 app.use('/wordle', wordledata);
 
-app.get('*', (req, res) => {
-  res.sendFile(__dirname + '/public/index.html');
-});
+app.use('/use', userdata);
 
-app.listen(port, () => {
-  console.log("Server is listening on port " + port + "!!");
-});
+app.use('/files', filesdata);
+
+app.set('view engine', 'ejs')
+
+
+
+const storage = multer.diskStorage({
+  destination: function(req, file, cb) {
+    return cb(null, "uploads")
+  },
+  filename: function (req, file, cb) {
+    return cb(null, `${Date.now()}_${file.originalname}`)
+  }
+})
+
+const upload = multer({storage})
+
+app.post('/upload', upload.single('file'), (req, res) => {
+  console.log(req.body)
+  console.log(req.file)
+})
+
+app.listen(port);
