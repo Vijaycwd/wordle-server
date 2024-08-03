@@ -148,7 +148,7 @@ router.route('/reset-password').post(async (req,res)=> {
       return res.status(400).json("User Not Found");
     }
     const userToken = await jwt.sign({email:userData.email},'coralWeb', {expiresIn:"5m"});
-    const emailLink = `http://localhost:3000/reset-password/${userData._id}/${userToken}`;
+    const emailLink = `https://wordle-frontend-2.onrender.com/reset-password/${userData._id}/${userToken}`;
     console.log(userData.email);
     console.log(userData.password);
     var transporter = nodemailer.createTransport({
