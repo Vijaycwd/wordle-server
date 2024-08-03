@@ -89,7 +89,6 @@ router.route('/login').post(async (req,res)=> {
   } catch (error) {
     return res.status(400).json("Invalid User");
   }
-
 })
 //get user list
 const validUser = (req,res,next) =>{
