@@ -83,12 +83,13 @@ router.route('/login').post(async (req,res)=> {
       }
       else{
         const userToken = await jwt.sign({email:userData.email},'coralWeb');
-        res.header('auth', userToken).send(userToken);
+        res.header('auth', userToken).send(userData);
       }
     }
   } catch (error) {
     return res.status(400).json("Invalid User");
   }
+
 })
 //get user list
 const validUser = (req,res,next) =>{
@@ -131,7 +132,11 @@ router.route('/:id').put(async (req, res) => {
     const userData = req.body;
     const updateuser = await userSchema.findByIdAndUpdate(userId, userData);
 
-    
+    /*const deleteduser = await userSchema.findByIdAndUpdate(userId);
+    if (!deleteduser) {
+      return res.status(404).json({ message: 'user not found' });
+    }
+    */
     res.status(200).json({ message: 'user Update successfully' });
   } catch (error) {
     res.status(500).json({ error: 'An error occurred while deleting the user' });
@@ -147,7 +152,7 @@ router.route('/reset-password').post(async (req,res)=> {
       return res.status(400).json("User Not Found");
     }
     const userToken = await jwt.sign({email:userData.email},'coralWeb', {expiresIn:"5m"});
-    const emailLink = `https://wordle-frontend-2.onrender.com/reset-password/${userData._id}/${userToken}`;
+    const emailLink = `http://localhost:3000/reset-password/${userData._id}/${userToken}`;
     console.log(userData.email);
     console.log(userData.password);
     var transporter = nodemailer.createTransport({
