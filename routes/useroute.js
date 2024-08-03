@@ -132,11 +132,7 @@ router.route('/:id').put(async (req, res) => {
     const userData = req.body;
     const updateuser = await userSchema.findByIdAndUpdate(userId, userData);
 
-    /*const deleteduser = await userSchema.findByIdAndUpdate(userId);
-    if (!deleteduser) {
-      return res.status(404).json({ message: 'user not found' });
-    }
-    */
+    
     res.status(200).json({ message: 'user Update successfully' });
   } catch (error) {
     res.status(500).json({ error: 'An error occurred while deleting the user' });
