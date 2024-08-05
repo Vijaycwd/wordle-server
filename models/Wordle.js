@@ -20,4 +20,4 @@ const wordleSchema = new Schema ({
     collection: 'Wordle'
 })
 
-module.exports = mongoose.model('Wordle', wordleSchema);
+module.exports = mongoose.model('Wordle', wordleSchema)
