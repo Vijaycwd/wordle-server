@@ -53,9 +53,7 @@ router.route('/create-user').post(upload.single('avatar'), async (req,res)=> {
       .then(users => res.json(users))
       .catch(err => res.json(err))
     }
-    /*userSchema.create(req.body)
-    .then(users => res.json(users))
-    .catch(err => res.json(err))*/
+    
   } catch (error) {
     res.status(400).json(error);
   }
