@@ -1,42 +1,67 @@
-const mongoose = require('mongoose');
 const express = require('express');
-router = express.Router();
+const router = express.Router();
+const wordleSchema = require('../models/Wordle'); // Adjust the path to your schema if necessary
 
-let wordleSchema = require('../models/Wordle');
+router.route('/wordle-score').post(async (req, res) => {
+  const { username, useremail, wordlescore, createdAt } = req.body;
 
-function isToday(dateString) {
-  const givenDate = new Date(dateString);
-  const today = new Date();
-  // Normalize both dates to midnight to avoid time comparison issues
-  const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-  const startOfGivenDate = new Date(givenDate.getFullYear(), givenDate.getMonth(), givenDate.getDate());
+  const wordleScoreObject = {
+      username,
+      useremail,
+      wordlescore,
+      createdAt: new Date(createdAt) // Ensure createdAt is a Date object
+  };
 
-  return startOfToday.getTime() === startOfGivenDate.getTime();
-}
+  try {
+      const startOfDay = new Date();
+      startOfDay.setHours(0, 0, 0, 0);
 
-router.route('/wordle-score').post(async (req,res) => {
-    const { username, useremail, wordlescore, createdAt } = req.body;
-    const checkToday = isToday(createdAt);
+      const endOfDay = new Date();
+      endOfDay.setHours(23, 59, 59, 999);
 
-    if(!checkToday){
-      console.log('Today data inserted sucessfully!');
-      try {
-        wordleSchema.create(req.body)
-        .then(scores => res.json(scores))
-        .catch(err => res.json(err))
-      } catch (error) {
-        
+      console.log(`Checking scores for email: ${useremail} between ${startOfDay} and ${endOfDay}`);
+
+      const existingScore = await wordleSchema.findOne({
+          useremail,
+          createdAt: { $gte: startOfDay, $lt: endOfDay }
+      });
+
+      if (existingScore) {
+          // console.log(`Score already exists for email: ${useremail} for today.`);
+          return res.status(409).json({ message: "Score for this email already exists for today" });
       }
-    }
-    else{
-      return res.status(409).json({ message: 'Entry with the same date already exists', data: req.body });
-    }
-})
 
-router.route('/').get((req,res) =>{
-    wordleSchema.find()
-    .then(scores => res.json(scores))
-    .catch(err => res.status(400).json("Erro: "+ err)) 
-  })
+      const newScore = await wordleSchema.create(wordleScoreObject);
+      // console.log(`New score created for email: ${useremail}`);
+      res.status(201).json(newScore);
 
-module.exports = router;
+  } catch (error) {
+      // console.error(`Error while creating score: ${error}`);
+      res.status(500).json({ message: "Server error" });
+  }
+});
+
+router.get('/', async (req, res) => {
+  const { useremail } = req.query;
+  // console.log(userEmail);
+  if (!useremail) {
+      return res.status(400).json({ message: "UserEmail is required" });
+  }
+  
+  const startOfDay = new Date();
+  startOfDay.setHours(0, 0, 0, 0);
+
+  const endOfDay = new Date();
+  endOfDay.setHours(23, 59, 59, 999);
+  
+  try {
+      const results = await wordleSchema.find({
+          createdAt: { $gte: startOfDay, $lt: endOfDay }
+      });
+      res.json(results);
+  } catch (error) {
+      res.status(500).json({ message: "Server error" });
+  }
+});
+
+module.exports = router
