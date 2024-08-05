@@ -12,4 +12,4 @@ const filesSchema = new Schema ({
     collection: 'Files'
 })
 
-module.exports = mongoose.model('Files',filesSchema);
+module.exports = mongoose.model('Files',filesSchema)

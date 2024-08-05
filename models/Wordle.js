@@ -12,12 +12,10 @@ const wordleSchema = new Schema ({
     },
     wordlescore:{
         type:String,
-    },
-    createdAt: {
-        type:String,
-    },
+    }
 },{
-    collection: 'Wordle'
+    collection: 'Wordle',
+    timestamps: true 
 })
 
 module.exports = mongoose.model('Wordle', wordleSchema)
