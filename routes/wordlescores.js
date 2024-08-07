@@ -14,7 +14,7 @@ router.route('/wordle-score').post(async (req, res) => {
     console.log(`Checking scores for email: ${useremail} between ${startOfDay} and ${endOfDay}`);
 
     const existingScore = await wordleSchema.findOne({
-        useremail,
+        useremail:useremail,
         createdAt: { $gte: startOfDay, $lt: endOfDay }
     });
 
