@@ -11,7 +11,7 @@ router.route('/wordle-score').post(async (req, res) => {
   const endOfDay = new Date();
   endOfDay.setHours(23, 59, 59, 999);
   try {
-    console.log(`Checking scores for email: ${useremail} between ${startOfDay} and ${endOfDay}`);
+    // console.log(`Checking scores for email: ${useremail} between ${startOfDay} and ${endOfDay}`);
 
     const existingScore = await wordleSchema.findOne({
         useremail:useremail,
@@ -28,7 +28,7 @@ router.route('/wordle-score').post(async (req, res) => {
         });
     }
 
-    const wordleScoreObject = new Wordle({
+    const wordleScoreObject = new wordleSchema({
         username,
         useremail,
         wordlescore
@@ -38,7 +38,7 @@ router.route('/wordle-score').post(async (req, res) => {
     res.status(201).json(newScore);
 
     } catch (error) {
-        console.error("Error saving score: ", error);
+        // console.error("Error saving score: ", error);
         res.status(500).json({ message: 'Error saving score.', error });
     }
 });
@@ -48,28 +48,4 @@ router.route('/').get((req,res) =>{
     .then(scores => res.json(scores))
     .catch(err => res.status(400).json("Erro: "+ err)) 
   })
-
-// router.get('/', async (req, res) => {
-//   const { userEmail } = req.query;
-//   // console.log(userEmail);
-//   if (!userEmail) {
-//       return res.status(400).json({ message: "UserEmail is required" });
-//   }
-  
-//   const startOfDay = new Date();
-//   startOfDay.setHours(0, 0, 0, 0);
-
-//   const endOfDay = new Date();
-//   endOfDay.setHours(23, 59, 59, 999);
-//   console.log(req);
-//   try {
-//       const results = await wordleSchema.find({
-//           createdAt: { $gte: startOfDay, $lt: endOfDay }
-//       });
-//       res.json(results);
-//   } catch (error) {
-//       res.status(500).json({ message: "Server error" });
-//   }
-// });
-
 module.exports = router
