@@ -12,12 +12,7 @@ const path = require('path');
 
 const wordledata = require('./routes/wordlescores');
 const userdata = require('./routes/useroute');
-
 const filesdata = require('./routes/filesroute')
-
-
-
-
 
 
 //Middleware
@@ -39,9 +34,6 @@ const connection = mongoose.connection;
 connection.once('open',()=>{
   console.log("Mongoose database Connected Successfully");
 })
-
-//Image Storage
-
 
 
 //apply cors

@@ -62,6 +62,7 @@ router.route('/create-user').post(upload.single('avatar'), async (req,res)=> {
 })
 
 
+
 //get user list
 router.route('/').get((req,res) =>{
   userSchema.find()
