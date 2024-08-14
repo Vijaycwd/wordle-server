@@ -12,6 +12,13 @@ const wordleSchema = new Schema ({
     },
     wordlescore:{
         type:String,
+    },
+    guessdistribution: {
+        type: [Number], // Array of numbers representing guess distribution
+        default: [0, 0, 0, 0, 0, 0], // Default value for 6 guesses
+    },
+    isWin:{
+        type:String,
     }
 },{
     collection: 'Wordle',

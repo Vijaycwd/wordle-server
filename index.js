@@ -13,6 +13,8 @@ const path = require('path');
 const wordledata = require('./routes/wordlescores');
 const userdata = require('./routes/useroute');
 const filesdata = require('./routes/filesroute')
+const wordlegamestat = require('./routes/wordlegamestats');
+
 
 
 //Middleware
@@ -49,6 +51,8 @@ app.use(function(req, res, next) {
 //localhost:5001/emp/create-employee-> frontend entpoint
 app.use('/wordle', wordledata);
 
+app.use('/wordle-game-stats', wordlegamestat);
+
 app.use('/use', userdata);
 
 app.use('/files', filesdata);
@@ -58,20 +62,20 @@ app.set('view engine', 'ejs')
 // Serve static files from the 'public' directory
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
-const storage = multer.diskStorage({
-  destination: function(req, file, cb) {
-    return cb(null, "uploads")
-  },
-  filename: function (req, file, cb) {
-    return cb(null, `${Date.now()}_${file.originalname}`)
-  }
-})
+// const storage = multer.diskStorage({
+//   destination: function(req, file, cb) {
+//     return cb(null, "uploads")
+//   },
+//   filename: function (req, file, cb) {
+//     return cb(null, `${Date.now()}_${file.originalname}`)
+//   }
+// })
 
-const upload = multer({storage})
+// const upload = multer({storage})
 
-app.post('/upload', upload.single('file'), (req, res) => {
-  console.log(req.body)
-  console.log(req.file)
-})
+// app.post('/upload', upload.single('file'), (req, res) => {
+//   console.log(req.body)
+//   console.log(req.file)
+// })
 
 app.listen(port);
