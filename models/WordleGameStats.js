@@ -18,6 +18,17 @@ const WordleStatsSchema  = new Schema ({
         type:Number,
         default: 0
     },
+    lastgameisWin:{
+        type:String,
+    },
+    currentStreak: {
+        type: Number,
+        default: 0,
+    },
+    maxStreak: {
+        type: Number,
+        default: 0,
+    },
 
 },{
     collection: 'WordleStats',
