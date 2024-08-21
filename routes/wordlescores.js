@@ -3,7 +3,7 @@ const router = express.Router();
 const wordleSchema = require('../models/Wordle'); // Adjust the path to your schema if necessary
 
 router.route('/wordle-score').post(async (req, res) => {
-    // console.log(req.body);
+    console.log(req.body);
     const { username, useremail, wordlescore, guessDistribution, isWin } = req.body;
 
     const startOfDay = new Date();
