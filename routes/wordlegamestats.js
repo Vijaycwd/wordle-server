@@ -83,7 +83,7 @@ router.post('/update', async (req, res) => {
             { new: true, upsert: true }  // Options: return the updated document, create if not found
         );
         
-        console.log(stats);
+        // console.log(stats);
         res.status(200).json(stats);
     } catch (err) {
         // console.error('Error updating stats:', err);
