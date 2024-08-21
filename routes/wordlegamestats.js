@@ -101,6 +101,4 @@ router.get('/:useremail', async (req, res) => {
     }
 });
 
-
-
 module.exports = router
