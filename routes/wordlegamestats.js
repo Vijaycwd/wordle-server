@@ -40,7 +40,7 @@ router.post('/update', async (req, res) => {
     try {
         const { username, useremail, totalWinGames, lastgameisWin } = req.body;
 
-        // console.log(req.body);
+        console.log(req.body);
 
         // Fetch current stats
         const currentStats = await wordlegamestatSchema.findOne({ useremail });
@@ -52,11 +52,7 @@ router.post('/update', async (req, res) => {
         // Check if the user played more than 30 days ago
         const lastGameDate = moment(currentStats.lastGameDate);
         const today = moment();
-        // Calculate the number of days in the current month
-        const daysInCurrentMonth = today.daysInMonth(); 
-
-        const thirtyDaysAgo = moment().subtract(daysInCurrentMonth, 'days'); // More than 30 days ago
-
+        const thirtyDaysAgo = moment().subtract(30, 'days'); // More than 30 days ago
 
         let newStreak = lastgameisWin ? currentStats.currentStreak + 1 : 0;
 
@@ -72,7 +68,7 @@ router.post('/update', async (req, res) => {
         // Update fields
         const updateFields = {
             $set: { username, useremail, lastGameDate: today.toISOString() }, // Update last game date
-            $inc: { totalGamesPlayed: 1, totalWinGames: totalWinGames ? 1 : 0 },
+            $inc: { totalGamesPlayed: 1, totalWinGames: lastgameisWin ? 1 : 0 },
             $set: { currentStreak: newStreak, maxStreak: newMaxStreak }
         };
 
@@ -83,7 +79,7 @@ router.post('/update', async (req, res) => {
             { new: true, upsert: true }  // Options: return the updated document, create if not found
         );
         
-        // console.log(stats);
+        console.log(stats);
         res.status(200).json(stats);
     } catch (err) {
         // console.error('Error updating stats:', err);
@@ -100,5 +96,7 @@ router.get('/:useremail', async (req, res) => {
         res.status(500).json({ message: err.message });
     }
 });
+
+
 
 module.exports = router
