@@ -9,7 +9,7 @@ router.route('/wordle-score').post(async (req, res) => {
     try {
         // Create Date objects from the user's local time (createdAt)
         const userDate = new Date(createdAt);
-
+        const timezoneOffset = userDate.getTimezoneOffset();
         // Set start and end of day based on the user's local time
         const startOfDay = new Date(userDate);
         startOfDay.setHours(0, 0, 0, 0);
@@ -17,11 +17,16 @@ router.route('/wordle-score').post(async (req, res) => {
         const endOfDay = new Date(userDate);
         endOfDay.setHours(23, 59, 59, 999);
 
-        // Check if a score already exists for the given email on the same day using the user's local time
+        // Convert to UTC to align with server time
+        const startOfDayUTC = new Date(startOfDay.getTime() - (timezoneOffset * 60000));
+        const endOfDayUTC = new Date(endOfDay.getTime() - (timezoneOffset * 60000));
+
+        // Check if a score already exists for the given email on the same day
         const existingScore = await wordleSchema.findOne({
             useremail: useremail,
-            createdAt: { $gte: startOfDay, $lt: endOfDay }
+            createdAt: { $gte: startOfDayUTC, $lt: endOfDayUTC }
         });
+    
 
         if (existingScore) {
             const now = new Date();
