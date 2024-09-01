@@ -4,12 +4,12 @@ const wordleSchema = require('../models/Wordle'); // Adjust the path to your sch
 
 router.route('/wordle-score').post(async (req, res) => {
     console.log(req.body);
-    const { username, useremail, wordlescore, guessDistribution, isWin } = req.body;
+    const { username, useremail, wordlescore, guessDistribution, isWin, createdAt } = req.body;
 
-    const startOfDay = new Date();
+    const startOfDay = new Date(createdAt);
     startOfDay.setHours(0, 0, 0, 0);
 
-    const endOfDay = new Date();
+    const endOfDay = new Date(createdAt);
     endOfDay.setHours(23, 59, 59, 999);
 
     try {
