@@ -25,7 +25,7 @@ router.route('/wordle-score').post(async (req, res) => {
             const minutesRemaining = Math.floor((endOfDay - now) / 1000 / 60) % 60;
 
             return res.status(409).json({
-                message: `Today’s score has already been added.  Play again in ${hoursRemaining} hours and ${minutesRemaining} minutes!`
+                message: `Today’s score has already been added.  Play again in ${hoursRemaining} hours and ${minutesRemaining} minutessss!`
             });
         }
 
