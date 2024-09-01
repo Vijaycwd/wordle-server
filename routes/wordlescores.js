@@ -7,31 +7,30 @@ router.route('/wordle-score').post(async (req, res) => {
     const { username, useremail, wordlescore, guessDistribution, isWin, createdAt } = req.body;
 
     try {
-        // Create Date objects from the user's local time (createdAt)
+        // Convert the user's local time (createdAt) to a Date object
         const userDate = new Date(createdAt);
         const timezoneOffset = userDate.getTimezoneOffset();
-        // Set start and end of day based on the user's local time
-        const startOfDay = new Date(userDate);
-        startOfDay.setHours(0, 0, 0, 0);
 
-        const endOfDay = new Date(userDate);
-        endOfDay.setHours(23, 59, 59, 999);
+        // Convert the user date to UTC
+        const createdAtUTC = new Date(userDate.getTime() - (timezoneOffset * 60000));
 
-        // Convert to UTC to align with server time
-        const startOfDayUTC = new Date(startOfDay.getTime() - (timezoneOffset * 60000));
-        const endOfDayUTC = new Date(endOfDay.getTime() - (timezoneOffset * 60000));
+        // Set start and end of day in UTC based on the user's local time
+        const startOfDayUTC = new Date(createdAtUTC);
+        startOfDayUTC.setUTCHours(0, 0, 0, 0);
+
+        const endOfDayUTC = new Date(createdAtUTC);
+        endOfDayUTC.setUTCHours(23, 59, 59, 999);
 
         // Check if a score already exists for the given email on the same day
         const existingScore = await wordleSchema.findOne({
             useremail: useremail,
             createdAt: { $gte: startOfDayUTC, $lt: endOfDayUTC }
         });
-    
 
         if (existingScore) {
             const now = new Date();
-            const hoursRemaining = Math.floor((endOfDay - now) / 1000 / 60 / 60);
-            const minutesRemaining = Math.floor((endOfDay - now) / 1000 / 60) % 60;
+            const hoursRemaining = Math.floor((endOfDayUTC - now) / 1000 / 60 / 60);
+            const minutesRemaining = Math.floor((endOfDayUTC - now) / 1000 / 60) % 60;
 
             return res.status(409).json({
                 message: `Today's score has already been added. Play again in ${hoursRemaining} hours and ${minutesRemaining} minutes!`
@@ -45,7 +44,7 @@ router.route('/wordle-score').post(async (req, res) => {
             wordlescore,
             guessDistribution,
             isWin,
-            createdAt: userDate // Save the user's local time as the creation time
+            createdAt: createdAtUTC // Store the user's time converted to UTC
         });
 
         const newScore = await wordleScoreObject.save();
@@ -56,6 +55,7 @@ router.route('/wordle-score').post(async (req, res) => {
         res.status(500).json({ message: 'Error saving score.', error });
     }
 });
+
 
 router.route('/').get((req,res) =>{
     wordleSchema.find()
