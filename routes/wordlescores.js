@@ -28,7 +28,7 @@ router.route('/wordle-score').post(async (req, res) => {
         });
 
         if (existingScore) {
-            const now = new Date(createdAt);
+            const now = new Date(createdAtUTC);
             const hoursRemaining = Math.floor((endOfDayUTC - now) / 1000 / 60 / 60);
             const minutesRemaining = Math.floor((endOfDayUTC - now) / 1000 / 60) % 60;
 
