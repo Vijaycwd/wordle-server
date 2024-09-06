@@ -9,6 +9,7 @@ router.route('/wordle-score').post(async (req, res) => {
     // Convert createdAt (time user played the game) to Date object
     const userGameDate = new Date(createdAt);
     const userCurrentDate = new Date(currentUserTime); // User's current time
+    console.log(userCurrentDate);
 
     if (isNaN(userGameDate.getTime()) || isNaN(userCurrentDate.getTime())) {
         return res.status(400).json({ message: 'Invalid date.' });
