@@ -4,19 +4,21 @@ const wordleSchema = require('../models/Wordle'); // Adjust the path to your sch
 
 router.route('/wordle-score').post(async (req, res) => {
     console.log(req.body);
-    const { username, useremail, wordlescore, guessDistribution, isWin, createdAt } = req.body;
+    const { username, useremail, wordlescore, guessDistribution, isWin, createdAt, currentUserTime } = req.body;
 
-    // Convert createdAt (which is from the frontend) to a Date object
-    const userDate = new Date(createdAt);
-    if (isNaN(userDate.getTime())) {
-        return res.status(400).json({ message: 'Invalid createdAt date.' });
+    // Convert createdAt (time user played the game) to Date object
+    const userGameDate = new Date(createdAt);
+    const userCurrentDate = new Date(currentUserTime); // User's current time
+
+    if (isNaN(userGameDate.getTime()) || isNaN(userCurrentDate.getTime())) {
+        return res.status(400).json({ message: 'Invalid date.' });
     }
 
-    // Set start and end of the day based on the user's createdAt date (to match their local timezone)
-    const startOfDay = new Date(userDate);
+    // Set start and end of the day based on the user's createdAt date
+    const startOfDay = new Date(userGameDate);
     startOfDay.setHours(0, 0, 0, 0);
 
-    const endOfDay = new Date(userDate);
+    const endOfDay = new Date(userGameDate);
     endOfDay.setHours(23, 59, 59, 999);
 
     try {
@@ -27,9 +29,8 @@ router.route('/wordle-score').post(async (req, res) => {
         });
 
         if (existingScore) {
-            // Use the user's createdAt date to calculate time remaining
-            const now = new Date(); // Use the current server time for comparison
-            const timeDiff = endOfDay - now;
+            // Calculate remaining time based on user's current time (not server time)
+            const timeDiff = endOfDay - userCurrentDate;
 
             if (timeDiff > 0) {
                 const hoursRemaining = Math.floor(timeDiff / 1000 / 60 / 60);
@@ -41,14 +42,14 @@ router.route('/wordle-score').post(async (req, res) => {
             }
         }
 
-        // Create and save the new Wordle score with guess distribution
+        // Create and save the new Wordle score
         const wordleScoreObject = new wordleSchema({
             username,
             useremail,
             wordlescore,
             guessDistribution,
             isWin,
-            createdAt: userDate // Save user's createdAt time
+            createdAt: userGameDate // Save the game time
         });
 
         const newScore = await wordleScoreObject.save();
@@ -59,7 +60,6 @@ router.route('/wordle-score').post(async (req, res) => {
         res.status(500).json({ message: 'Error saving score.', error });
     }
 });
-
 
 router.route('/').get((req,res) =>{
     wordleSchema.find()
