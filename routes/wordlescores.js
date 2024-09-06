@@ -3,7 +3,7 @@ const router = express.Router();
 const wordleSchema = require('../models/Wordle'); // Adjust the path to your schema if necessary
 
 router.route('/wordle-score').post(async (req, res) => {
-    console.log(req.body);
+    // console.log(req.body);
     const { username, useremail, wordlescore, guessDistribution, isWin, createdAt, currentUserTime } = req.body;
 
     // Convert createdAt (time user played the game) to Date object
@@ -27,7 +27,7 @@ router.route('/wordle-score').post(async (req, res) => {
             useremail: useremail,
             createdAt: { $gte: startOfDay, $lt: endOfDay }
         });
-
+         console.log(existingScore);
         if (existingScore) {
             // Calculate remaining time based on user's current time (not server time)
             const timeDiff = endOfDay - userCurrentDate;
