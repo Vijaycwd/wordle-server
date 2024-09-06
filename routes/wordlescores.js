@@ -27,11 +27,12 @@ router.route('/wordle-score').post(async (req, res) => {
             useremail: useremail,
             createdAt: { $gte: startOfDay, $lt: endOfDay }
         });
-         console.log('existingscore is',existingScore);
+        
         if (existingScore) {
             // Calculate remaining time based on user's current time (not server time)
+           
             const timeDiff = endOfDay - userCurrentDate;
-
+            console.log('timeDiff is', timeDiff);
             if (timeDiff > 0) {
                 const hoursRemaining = Math.floor(timeDiff / 1000 / 60 / 60);
                 const minutesRemaining = Math.floor(timeDiff / 1000 / 60) % 60;
