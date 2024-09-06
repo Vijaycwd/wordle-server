@@ -78,4 +78,9 @@ app.use('/public', express.static(path.join(__dirname, 'public')));
 //   console.log(req.file)
 // })
 
+app.get('/timezone', (req, res) => {
+  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  res.json({ timeZone });
+});
+
 app.listen(port);

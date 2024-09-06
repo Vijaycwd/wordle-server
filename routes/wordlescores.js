@@ -52,4 +52,11 @@ router.route('/').get((req,res) =>{
     .then(scores => res.json(scores))
     .catch(err => res.status(400).json("Erro: "+ err)) 
   })
+
+//Get Server Timezone
+router.route('/timezone').get((req, res) => {
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    res.json({ timeZone });
+});
+
 module.exports = router
