@@ -33,6 +33,12 @@ router.route('/wordle-score').post(async (req, res) => {
         
         if (existingScore) {
             // Calculate remaining time based on user's current time
+
+            console.log('userGameDate in UTC:', userGameDate.toISOString());
+            console.log('userCurrentDate in UTC:', userCurrentDate.toISOString());
+            console.log('startOfDayUTC:', startOfDayUTC.toISOString());
+            console.log('endOfDayUTC:', endOfDayUTC.toISOString());
+
             const timeDiff = endOfDayUTC - userCurrentDateUTC;
             if (timeDiff > 0) {
                 const hoursRemaining = Math.floor(timeDiff / 1000 / 60 / 60);
