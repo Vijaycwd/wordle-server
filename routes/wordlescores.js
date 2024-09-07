@@ -10,7 +10,6 @@ const isValidDate = (date) => !isNaN(new Date(date).getTime());
 const getCurrentDateTimeInZone = (timeZone) => {
     return moment.tz(timeZone).format(); // Format date-time in the given time zone
 };
-console.log('CurrentDateTimeInZone', getCurrentDateTimeInZone)
 // Middleware to convert time zone to UTC
 const convertToUTC = (date, timeZone) => {
     return moment.tz(date, timeZone).utc().toDate(); // Convert given date-time to UTC
