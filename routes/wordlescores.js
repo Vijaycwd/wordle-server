@@ -23,7 +23,7 @@ router.route('/wordle-score').post(async (req, res) => {
 
     const endOfDayUTC = new Date(userGameDate);
     endOfDayUTC.setUTCHours(23, 59, 59, 999);
-
+    console.log(userCurrentDate);
     try {
         // Check if a score already exists for the given email on the same day
         const existingScore = await wordleSchema.findOne({
