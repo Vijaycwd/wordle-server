@@ -1,29 +1,47 @@
 const express = require('express');
 const router = express.Router();
 const wordleSchema = require('../models/Wordle'); // Adjust the path to your schema if necessary
+const moment = require('moment-timezone'); // For better time zone handling
 
 // Helper function to validate date inputs
 const isValidDate = (date) => !isNaN(new Date(date).getTime());
 
+// Function to get current date-time in a given time zone
+const getCurrentDateTimeInZone = (timeZone) => {
+    return moment.tz(timeZone).format(); // Format date-time in the given time zone
+};
+
+// Middleware to convert time zone to UTC
+const convertToUTC = (date, timeZone) => {
+    return moment.tz(date, timeZone).utc().toDate(); // Convert given date-time to UTC
+};
+
 router.route('/wordle-score').post(async (req, res) => {
-    const { username, useremail, wordlescore, guessDistribution, isWin, createdAt, currentUserTime } = req.body;
+    const { username, useremail, wordlescore, guessDistribution, isWin, createdAt, currentUserTime, timeZone } = req.body;
 
     // Validate date inputs
-    if (!isValidDate(createdAt) || !isValidDate(currentUserTime)) {
-        return res.status(400).json({ message: 'Invalid date provided.' });
+    if (!isValidDate(createdAt) || !isValidDate(currentUserTime) || !timeZone) {
+        return res.status(400).json({ message: 'Invalid date or time zone provided.' });
     }
 
     // Convert createdAt and currentUserTime to Date objects in UTC
     const userGameDate = new Date(createdAt);
     const userCurrentDate = new Date(currentUserTime);
 
-    // Set start and end of the day based on the user's createdAt date
-    const startOfDayUTC = new Date(userGameDate);
+    // Convert both to UTC using the provided time zone
+    const userGameDateUTC = convertToUTC(userGameDate, timeZone);
+    const userCurrentDateUTC = convertToUTC(userCurrentDate, timeZone);
+
+    // Set start and end of the day based on the user's createdAt date in UTC
+    const startOfDayUTC = new Date(userGameDateUTC);
     startOfDayUTC.setUTCHours(0, 0, 0, 0);
 
-    const endOfDayUTC = new Date(userGameDate);
+    const endOfDayUTC = new Date(userGameDateUTC);
     endOfDayUTC.setUTCHours(23, 59, 59, 999);
-    console.log(userCurrentDate);
+
+    console.log('User Current Date (UTC):', userCurrentDateUTC);
+    console.log('End of Day (UTC):', endOfDayUTC);
+
     try {
         // Check if a score already exists for the given email on the same day
         const existingScore = await wordleSchema.findOne({
@@ -33,7 +51,7 @@ router.route('/wordle-score').post(async (req, res) => {
 
         if (existingScore) {
             // Calculate remaining time based on user's current time
-            const timeDiff = endOfDayUTC - userCurrentDate;
+            const timeDiff = endOfDayUTC - userCurrentDateUTC;
             if (timeDiff > 0) {
                 const hoursRemaining = Math.floor(timeDiff / 1000 / 60 / 60);
                 const minutesRemaining = Math.floor(timeDiff / 1000 / 60) % 60;
@@ -51,7 +69,7 @@ router.route('/wordle-score').post(async (req, res) => {
             wordlescore,
             guessDistribution,
             isWin,
-            createdAt: userGameDate // Save the game time as a Date object
+            createdAt: userGameDateUTC // Save the game time as a Date object in UTC
         });
 
         const newScore = await wordleScoreObject.save();
