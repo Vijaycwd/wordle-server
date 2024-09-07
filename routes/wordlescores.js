@@ -6,44 +6,38 @@ router.route('/wordle-score').post(async (req, res) => {
     // console.log(req.body);
     const { username, useremail, wordlescore, guessDistribution, isWin, createdAt, currentUserTime } = req.body;
 
-    const userGameDate = new Date(createdAt).toISOString(); // Convert to UTC
-    const userCurrentDate = new Date(currentUserTime).toISOString(); // Convert to UTC
+    // Convert createdAt (time user played the game) to Date object
+    const userGameDate = new Date(createdAt);
+    const userCurrentDate = new Date(currentUserTime); // User's current time
     console.log(userCurrentDate);
 
-    // if (isNaN(userGameDate.getTime()) || isNaN(userCurrentDate.getTime())) {
-    //     return res.status(400).json({ message: 'Invalid date.' });
-    // }
+    if (isNaN(userGameDate.getTime()) || isNaN(userCurrentDate.getTime())) {
+        return res.status(400).json({ message: 'Invalid date.' });
+    }
 
     // Set start and end of the day based on the user's createdAt date
-    // Convert user game date and current date to UTC
-    const startOfDayUTC = new Date(userGameDate);
-    startOfDayUTC.setUTCHours(0, 0, 0, 0);
+    const startOfDay = new Date(userGameDate);
+    startOfDay.setHours(0, 0, 0, 0);
 
-    const endOfDayUTC = new Date(userGameDate);
-    endOfDayUTC.setUTCHours(23, 59, 59, 999);
-
-    const userCurrentDateUTC = new Date(userCurrentDate);
+    const endOfDay = new Date(userGameDate);
+    endOfDay.setHours(23, 59, 59, 999);
 
     try {
         // Check if a score already exists for the given email on the same day
         const existingScore = await wordleSchema.findOne({
             useremail: useremail,
-            createdAt: { $gte: startOfDayUTC, $lt: endOfDayUTC }
+            createdAt: { $gte: startOfDay, $lt: endOfDay }
         });
         
         if (existingScore) {
-            // Calculate remaining time based on user's current time
-
-            console.log('userGameDate in UTC:', userGameDate.toISOString());
-            console.log('userCurrentDate in UTC:', userCurrentDate.toISOString());
-            console.log('startOfDayUTC:', startOfDayUTC.toISOString());
-            console.log('endOfDayUTC:', endOfDayUTC.toISOString());
-
-            const timeDiff = endOfDayUTC - userCurrentDateUTC;
+            // Calculate remaining time based on user's current time (not server time)
+            console.log('userCurrentDate is', userCurrentDate);
+            const timeDiff = endOfDay - userCurrentDate;
+            console.log('timeDiff is', timeDiff);
             if (timeDiff > 0) {
                 const hoursRemaining = Math.floor(timeDiff / 1000 / 60 / 60);
                 const minutesRemaining = Math.floor(timeDiff / 1000 / 60) % 60;
-        
+
                 return res.status(409).json({
                     message: `Today’s score has already been added. Play again in ${hoursRemaining} hours and ${minutesRemaining} minutes!`
                 });
