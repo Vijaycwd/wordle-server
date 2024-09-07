@@ -10,7 +10,7 @@ const isValidDate = (date) => !isNaN(new Date(date).getTime());
 const getCurrentDateTimeInZone = (timeZone) => {
     return moment.tz(timeZone).format(); // Format date-time in the given time zone
 };
-
+console.log('CurrentDateTimeInZone', getCurrentDateTimeInZone)
 // Middleware to convert time zone to UTC
 const convertToUTC = (date, timeZone) => {
     return moment.tz(date, timeZone).utc().toDate(); // Convert given date-time to UTC
@@ -18,7 +18,7 @@ const convertToUTC = (date, timeZone) => {
 
 router.route('/wordle-score').post(async (req, res) => {
     const { username, useremail, wordlescore, guessDistribution, isWin, createdAt, currentUserTime, timeZone } = req.body;
-
+     console.log()
     // Validate date inputs
     if (!isValidDate(createdAt) || !isValidDate(currentUserTime) || !timeZone) {
         return res.status(400).json({ message: 'Invalid date or time zone provided.' });
