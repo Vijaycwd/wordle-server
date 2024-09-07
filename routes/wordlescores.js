@@ -10,9 +10,9 @@ router.route('/wordle-score').post(async (req, res) => {
     const userCurrentDate = new Date(currentUserTime).toISOString(); // Convert to UTC
     console.log(userCurrentDate);
 
-    if (isNaN(userGameDate.getTime()) || isNaN(userCurrentDate.getTime())) {
-        return res.status(400).json({ message: 'Invalid date.' });
-    }
+    // if (isNaN(userGameDate.getTime()) || isNaN(userCurrentDate.getTime())) {
+    //     return res.status(400).json({ message: 'Invalid date.' });
+    // }
 
     // Set start and end of the day based on the user's createdAt date
     // Convert user game date and current date to UTC
