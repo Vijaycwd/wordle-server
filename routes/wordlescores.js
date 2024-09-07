@@ -1,56 +1,39 @@
 const express = require('express');
 const router = express.Router();
 const wordleSchema = require('../models/Wordle'); // Adjust the path to your schema if necessary
-const moment = require('moment-timezone'); // For better time zone handling
-
-// Helper function to validate date inputs
-const isValidDate = (date) => !isNaN(new Date(date).getTime());
-
-// Function to get current date-time in a given time zone
-const getCurrentDateTimeInZone = (timeZone) => {
-    return moment.tz(timeZone).format(); // Format date-time in the given time zone
-};
-// Middleware to convert time zone to UTC
-const convertToUTC = (date, timeZone) => {
-    return moment.tz(date, timeZone).utc().toDate(); // Convert given date-time to UTC
-};
 
 router.route('/wordle-score').post(async (req, res) => {
-    const { username, useremail, wordlescore, guessDistribution, isWin, createdAt, currentUserTime, timeZone } = req.body;
-     console.log()
-    // Validate date inputs
-    if (!isValidDate(createdAt) || !isValidDate(currentUserTime) || !timeZone) {
-        return res.status(400).json({ message: 'Invalid date or time zone provided.' });
+    // console.log(req.body);
+    const { username, useremail, wordlescore, guessDistribution, isWin, createdAt, currentUserTime } = req.body;
+
+    // Convert createdAt (time user played the game) to Date object
+    const userGameDate = new Date(createdAt);
+    const userCurrentDate = new Date(currentUserTime); // User's current time
+    console.log(userCurrentDate);
+
+    if (isNaN(userGameDate.getTime()) || isNaN(userCurrentDate.getTime())) {
+        return res.status(400).json({ message: 'Invalid date.' });
     }
 
-    // Convert createdAt and currentUserTime to Date objects in UTC
-    const userGameDate = new Date(createdAt);
-    const userCurrentDate = new Date(currentUserTime);
+    // Set start and end of the day based on the user's createdAt date
+    const startOfDay = new Date(userGameDate);
+    startOfDay.setHours(0, 0, 0, 0);
 
-    // Convert both to UTC using the provided time zone
-    const userGameDateUTC = convertToUTC(userGameDate, timeZone);
-    const userCurrentDateUTC = convertToUTC(userCurrentDate, timeZone);
-
-    // Set start and end of the day based on the user's createdAt date in UTC
-    const startOfDayUTC = new Date(userGameDateUTC);
-    startOfDayUTC.setUTCHours(0, 0, 0, 0);
-
-    const endOfDayUTC = new Date(userGameDateUTC);
-    endOfDayUTC.setUTCHours(23, 59, 59, 999);
-
-    console.log('User Current Date (UTC):', userCurrentDateUTC);
-    console.log('End of Day (UTC):', endOfDayUTC);
+    const endOfDay = new Date(userGameDate);
+    endOfDay.setHours(23, 59, 59, 999);
 
     try {
         // Check if a score already exists for the given email on the same day
         const existingScore = await wordleSchema.findOne({
             useremail: useremail,
-            createdAt: { $gte: startOfDayUTC, $lt: endOfDayUTC }
+            createdAt: { $gte: startOfDay, $lt: endOfDay }
         });
-
+        
         if (existingScore) {
-            // Calculate remaining time based on user's current time
-            const timeDiff = endOfDayUTC - userCurrentDateUTC;
+            // Calculate remaining time based on user's current time (not server time)
+            console.log('userCurrentDate is', userCurrentDate);
+            const timeDiff = endOfDay - userCurrentDate;
+            console.log('timeDiff is', timeDiff);
             if (timeDiff > 0) {
                 const hoursRemaining = Math.floor(timeDiff / 1000 / 60 / 60);
                 const minutesRemaining = Math.floor(timeDiff / 1000 / 60) % 60;
@@ -68,26 +51,24 @@ router.route('/wordle-score').post(async (req, res) => {
             wordlescore,
             guessDistribution,
             isWin,
-            createdAt: userGameDateUTC // Save the game time as a Date object in UTC
+            createdAt: userGameDate // Save the game time
         });
 
         const newScore = await wordleScoreObject.save();
         res.status(201).json(newScore);
 
     } catch (error) {
-        console.error('Error saving score:', error); // Improved error logging
-        res.status(500).json({ message: 'Error saving score.', error: error.message });
+        // Handle error in saving the score
+        res.status(500).json({ message: 'Error saving score.', error });
     }
 });
 
-router.route('/').get(async (req, res) => {
-    try {
-        const scores = await wordleSchema.find();
-        res.json(scores);
-    } catch (err) {
-        console.error('Error retrieving scores:', err); // Improved error logging
-        res.status(400).json({ message: 'Error retrieving scores.', error: err.message });
-    }
-});
+router.route('/').get((req,res) =>{
+    wordleSchema.find()
+    .then(scores => res.json(scores))
+    .catch(err => res.status(400).json("Erro: "+ err)) 
+  })
 
-module.exports = router;
+
+
+module.exports = router
