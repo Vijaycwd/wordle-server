@@ -128,20 +128,28 @@ router.route('/:id').delete(async (req, res) => {
 router.route('/:id').put(async (req, res) => {
   const userId = req.params.id;
   try {
-    const userId = req.params.id;
     const userData = req.body;
-    const updateuser = await userSchema.findByIdAndUpdate(userId, userData);
 
-    /*const deleteduser = await userSchema.findByIdAndUpdate(userId);
-    if (!deleteduser) {
-      return res.status(404).json({ message: 'user not found' });
+    // Check if the password is being updated
+    if (userData.password) {
+      // Hash the new password before updating
+      const hash = await bcrypt.hash(userData.password, 10);
+      userData.password = hash;
     }
-    */
-    res.status(200).json({ message: 'user Update successfully' });
+
+    // Update the user with the new data
+    const updatedUser = await userSchema.findByIdAndUpdate(userId, userData, { new: true });
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.status(200).json({ message: 'User updated successfully', user: updatedUser });
   } catch (error) {
-    res.status(500).json({ error: 'An error occurred while deleting the user' });
+    res.status(500).json({ error: 'An error occurred while updating the user' });
   }
 });
+
 
 //Reset Password
 
