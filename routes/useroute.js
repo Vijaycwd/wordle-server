@@ -125,7 +125,7 @@ router.route('/:id').delete(async (req, res) => {
   }
 });
 
-router.route('/:id').put(async (req, res) => {
+router.route('/:id').put(upload.single('avatar'), async (req, res) => {
   const userId = req.params.id;
   try {
     const userData = req.body;
