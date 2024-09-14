@@ -130,6 +130,15 @@ router.route('/:id').put(upload.single('avatar'), async (req, res) => {
   try {
     const userData = req.body;
 
+    // Check if the email is being updated
+    if (userData.email) {
+      const existingUser = await userSchema.findOne({ email: userData.email });
+
+      // If another user already exists with the new email, prevent the update
+      if (existingUser && existingUser._id.toString() !== userId) {
+        return res.status(400).json({ message: 'Email already in use by another user' });
+      }
+    }
     // Check if the password is being updated
     if (userData.password) {
       // Hash the new password before updating
