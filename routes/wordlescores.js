@@ -62,38 +62,16 @@ router.route('/wordle-score').post(async (req, res) => {
     }
 });
 
-// router.route('/').get((req, res) => {
-//     wordleSchema.find()
-//         .then(scores => res.json(scores))
-//         .catch(err => res.status(400).json({ message: "Error retrieving scores", error: err }));
-// });
-
-router.route('/').get((req, res) => {
-    const { timeZone } = req.query;
-
-    // Check if timeZone is provided
-    if (!timeZone) {
-        return res.status(400).json({ message: 'Time zone is required.' });
-    }
-
+// Get total games played and statistics
+router.get('/:useremail', async (req, res) => {
     try {
-        // Get current time in the user's time zone
-        const currentTime = moment.tz(timeZone).toDate();
-        console.log('Current Time',currentTime);
-        // Set start and end of the day based on the user's current date in the provided time zone
-        const startOfDay = moment.tz(currentTime, timeZone).startOf('day').utc().toDate();
-        const endOfDay = moment.tz(currentTime, timeZone).endOf('day').utc().toDate();
-        console.log('Current Days',startOfDay,endOfDay);
-        // Find scores created between the start and end of the day
-        wordleSchema.find({
-            createdAt: { $gte: startOfDay, $lt: endOfDay }
-        })
-        .then(scores => res.json(scores))
-        .catch(err => res.status(400).json({ message: "Error retrieving scores", error: err }));
-
-    } catch (error) {
-        res.status(500).json({ message: "Error processing the time zone.", error });
+        const stats = await wordleSchema.findOne({ useremail: req.params.useremail });
+        if (!stats) return res.status(404).json({ message: 'User not found' });
+        res.status(200).json(stats);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
     }
 });
+
 
 module.exports = router;
