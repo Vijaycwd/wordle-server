@@ -65,7 +65,7 @@ router.route('/wordle-score').post(async (req, res) => {
 // Get total games played and statistics
 router.get('/:useremail', async (req, res) => {
     try {
-        const stats = await wordleScoreObject.findOne({ useremail: req.params.useremail });
+        const stats = await wordleSchema.findOne({ useremail: req.params.useremail });
         console.log(stats);
         if (!stats) return res.status(404).json({ message: 'User not found' });
         res.status(200).json(stats);
