@@ -79,11 +79,11 @@ router.route('/').get((req, res) => {
     try {
         // Get current time in the user's time zone
         const currentTime = moment.tz(timeZone).toDate();
-
+        console.log('Current Time',currentTime);
         // Set start and end of the day based on the user's current date in the provided time zone
         const startOfDay = moment.tz(currentTime, timeZone).startOf('day').utc().toDate();
         const endOfDay = moment.tz(currentTime, timeZone).endOf('day').utc().toDate();
-
+        console.log('Current Days',startOfDay,endOfDay);
         // Find scores created between the start and end of the day
         wordleSchema.find({
             createdAt: { $gte: startOfDay, $lt: endOfDay }
