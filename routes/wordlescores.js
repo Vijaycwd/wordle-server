@@ -64,14 +64,33 @@ router.route('/wordle-score').post(async (req, res) => {
 
 // Get total games played and statistics
 router.get('/:useremail', async (req, res) => {
+    const { useremail } = req.params;
+    const { timeZone } = req.query;
+
+    // Check if time zone is provided in the query parameters
+    if (!timeZone) {
+        return res.status(400).json({ message: 'Time zone is required.' });
+    }
+
     try {
-        const stats = await wordleSchema.find({ useremail: req.params.useremail });
-        console.log(stats);
-        if (!stats) return res.status(404).json({ message: 'User not found' });
-        res.status(200).json(stats);
+        // Retrieve all statistics for the user
+        const stats = await wordleSchema.find({ useremail });
+
+        if (!stats || stats.length === 0) {
+            return res.status(404).json({ message: 'User not found or no scores available' });
+        }
+
+        // Convert each createdAt timestamp to the user's local time based on the provided time zone
+        const formattedStats = stats.map(stat => ({
+            ...stat.toObject(),
+            createdAtLocal: moment.tz(stat.createdAt, timeZone).format('DD-MM-YYYY HH:mm:ss')
+        }));
+
+        res.status(200).json(formattedStats);
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
 });
+
 
 module.exports = router;
