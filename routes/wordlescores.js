@@ -63,36 +63,51 @@ router.route('/wordle-score').post(async (req, res) => {
 });
 
 // Get total games played and statistics
+// Get total games played and statistics for a specific date
 router.get('/:useremail', async (req, res) => {
     const { useremail } = req.params;
-    const { timeZone } = req.query;
+    const { timeZone, targetDate } = req.query;
 
-    // Check if time zone is provided in the query parameters
-    if (!timeZone) {
-        return res.status(400).json({ message: 'Time zone is required.' });
+    // Check if time zone and target date are provided in the query parameters
+    if (!timeZone || !targetDate) {
+        return res.status(400).json({ message: 'Time zone and target date are required.' });
     }
 
     try {
-        // Retrieve all statistics for the user
-        const stats = await wordleSchema.find({ useremail });
+        // Convert the target date to a moment object in the specified timezone
+        const startOfDayLocal = moment.tz(targetDate, 'DD-MM-YYYY', timeZone).startOf('day');
+        const endOfDayLocal = moment.tz(targetDate, 'DD-MM-YYYY', timeZone).endOf('day');
+
+        // Convert the start and end of the day to UTC time
+        const startOfDayUTC = startOfDayLocal.clone().utc().format();
+        const endOfDayUTC = endOfDayLocal.clone().utc().format();
+
+        console.log(`Querying records for user: ${useremail}`);
+        console.log(`Target Date (Local Time): ${targetDate}`);
+        console.log(`Start of Day (Local): ${startOfDayLocal.format('DD-MM-YYYY HH:mm:ss')}`);
+        console.log(`End of Day (Local): ${endOfDayLocal.format('DD-MM-YYYY HH:mm:ss')}`);
+        console.log(`Start of Day (UTC): ${startOfDayUTC}`);
+        console.log(`End of Day (UTC): ${endOfDayUTC}`);
+
+        // Retrieve all statistics for the user that fall within the specified date range in UTC
+        const stats = await wordleSchema.find({
+            useremail,
+            createdAt: {
+                $gte: startOfDayUTC,
+                $lte: endOfDayUTC
+            }
+        });
 
         if (!stats || stats.length === 0) {
-            return res.status(404).json({ message: 'User not found or no scores available' });
+            return res.status(404).json({ message: 'No records found for the specified date.' });
         }
-
-        // Log the original `createdAt` timestamps for debugging purposes
-        console.log("Original createdAt timestamps:", stats.map(stat => stat.createdAt));
 
         // Convert each createdAt timestamp to the user's local time based on the provided time zone
         const formattedStats = stats.map(stat => ({
             ...stat.toObject(),
-            // Log the original createdAt value for each record before conversion
-            createdAtOriginal: stat.createdAt,  // <-- Log the original createdAt date as a new field
+            createdAtOriginal: stat.createdAt,
             createdAtLocal: moment.tz(stat.createdAt, timeZone).format('DD-MM-YYYY HH:mm:ss')
         }));
-
-        // Log formatted timestamps for debugging
-        console.log("Formatted createdAtLocal timestamps:", formattedStats.map(stat => stat.createdAtLocal));
 
         res.status(200).json(formattedStats);
     } catch (err) {
