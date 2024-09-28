@@ -83,8 +83,9 @@ router.get('/:useremail', async (req, res) => {
         // Convert each createdAt timestamp to the user's local time based on the provided time zone
         const formattedStats = stats.map(stat => ({
             ...stat.toObject(),
-            createdAtLocal: moment.tz(stat.createdAt, timeZone).format('DD-MM-YYYY HH:mm:ss')
+            createdAtLocal: moment.tz(stat.createdAt, timeZone).format('YYYY-MM-DD HH:mm:ss') // Use consistent format
         }));
+        
 
         res.status(200).json(formattedStats);
     } catch (err) {
