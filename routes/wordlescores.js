@@ -80,11 +80,19 @@ router.get('/:useremail', async (req, res) => {
             return res.status(404).json({ message: 'User not found or no scores available' });
         }
 
+        // Log the original `createdAt` timestamps for debugging purposes
+        console.log("Original createdAt timestamps:", stats.map(stat => stat.createdAt));
+
         // Convert each createdAt timestamp to the user's local time based on the provided time zone
         const formattedStats = stats.map(stat => ({
             ...stat.toObject(),
+            // Log the original createdAt value for each record before conversion
+            createdAtOriginal: stat.createdAt,  // <-- Log the original createdAt date as a new field
             createdAtLocal: moment.tz(stat.createdAt, timeZone).format('DD-MM-YYYY HH:mm:ss')
         }));
+
+        // Log formatted timestamps for debugging
+        console.log("Formatted createdAtLocal timestamps:", formattedStats.map(stat => stat.createdAtLocal));
 
         res.status(200).json(formattedStats);
     } catch (err) {
