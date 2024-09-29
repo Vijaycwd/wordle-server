@@ -62,7 +62,6 @@ router.route('/wordle-score').post(async (req, res) => {
     }
 });
 
-// Get total games played and statistics
 router.get('/:useremail', async (req, res) => {
     const { useremail } = req.params;
     const { timeZone } = req.query;
@@ -83,7 +82,7 @@ router.get('/:useremail', async (req, res) => {
         // Convert each createdAt timestamp to the user's local time based on the provided time zone
         const formattedStats = stats.map(stat => ({
             ...stat.toObject(),
-            createdAtLocal: moment.tz(stat.createdAt, timeZone).format('YYYY-MM-DD HH:mm:ss') // Use consistent format
+            createdAtLocal: moment.tz(stat.createdAt, timeZone).format('DD-MM-YYYY HH:mm:ss') // Use consistent format
         }));
         
 
@@ -93,5 +92,38 @@ router.get('/:useremail', async (req, res) => {
     }
 });
 
+
+// New endpoint to get statistics by date
+router.get('/:useremail/date', async (req, res) => {
+    const { useremail } = req.params;
+    const { date, timeZone } = req.query;
+
+    // Check if both date and time zone are provided in the query parameters
+    if (!date || !timeZone) {
+        return res.status(400).json({ message: 'Date and time zone are required.' });
+    }
+
+    try {
+        // Retrieve all statistics for the user
+        const stats = await wordleSchema.find({ useremail });
+
+        if (!stats || stats.length === 0) {
+            return res.status(404).json({ message: 'User not found or no scores available.' });
+        }
+
+        // Convert the selected date to the user's local time zone
+        const selectedDate = moment.tz(date, 'YYYY-MM-DD', timeZone).startOf('day');
+
+        // Filter statistics based on the selected date in the user's local time
+        const filteredStats = stats.filter(stat => {
+            const createdAtLocal = moment.tz(stat.createdAt, timeZone);
+            return createdAtLocal.isSame(selectedDate, 'day');
+        });
+
+        res.status(200).json(filteredStats);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
 
 module.exports = router;
