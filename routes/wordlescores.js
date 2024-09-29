@@ -112,7 +112,8 @@ router.get('/:useremail/date', async (req, res) => {
         }
 
         // Convert the selected date to the user's local time zone
-        const selectedDate = moment.tz(date, 'YYYY-MM-DD', timeZone).startOf('day');
+        const selectedDate = moment.tz(date, 'DD-MM-YYYY', timeZone).startOf('day');
+        console.log('Selected Date',selectedDate);
 
         // Filter statistics based on the selected date in the user's local time
         const filteredStats = stats.filter(stat => {
