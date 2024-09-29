@@ -111,17 +111,22 @@ router.get('/:useremail/date', async (req, res) => {
             return res.status(404).json({ message: 'User not found or no scores available.' });
         }
 
-        // Convert the selected date to the user's local time zone
-        const selectedDate = moment.tz(date, 'DD-MM-YYYY', timeZone).startOf('day');
-        console.log('Selected Date',selectedDate);
+        // Convert the selected date to the start and end of the day in the user's local time zone
+        const startOfDay = moment.tz(date, 'DD-MM-YYYY', timeZone).startOf('day').toDate();
+        const endOfDay = moment.tz(date, 'DD-MM-YYYY', timeZone).endOf('day').toDate();
 
-        // Filter statistics based on the selected date in the user's local time
+        // Filter statistics based on whether the createdAt timestamp falls within the start and end of the selected day
         const filteredStats = stats.filter(stat => {
-            const createdAtLocal = moment.tz(stat.createdAt, timeZone);
-            return createdAtLocal.isSame(selectedDate, 'day');
+            const createdAtLocal = moment.tz(stat.createdAt, timeZone).toDate();
+            return createdAtLocal >= startOfDay && createdAtLocal <= endOfDay;
         });
 
-        res.status(200).json(filteredStats);
+        // Return filtered stats or message if no records found for the selected date
+        if (filteredStats.length > 0) {
+            res.status(200).json(filteredStats);
+        } else {
+            res.status(404).json({ message: `No scores found for the selected date: ${date}.` });
+        }
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
