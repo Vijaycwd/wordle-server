@@ -1,7 +1,7 @@
-const multer = require('multer');
-const mongoose = require('mongoose');
 const express = require('express');
 const bcrypt = require('bcryptjs');
+const multer = require('multer');
+const mongoose = require('mongoose');
 
 //create tokem
 const jwt = require('jsonwebtoken');
