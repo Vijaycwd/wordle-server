@@ -46,7 +46,7 @@ router.route('/create-user').post(upload.single('avatar'), async (req,res)=> {
         username: req.body.username,
         email: req.body.email,
         password: hash,
-        avatar: `http://localhost:5173/public/uploads/${req.file.originalname}`
+        avatar: req.file.originalname
       }
       console.log(userObject);
       userSchema.create(userObject)
