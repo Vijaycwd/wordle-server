@@ -30,7 +30,7 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage: storage });
-
+console.log(upload);
 router.route('/create-user').post(upload.single('avatar'), async (req, res) => {
   try {
     // Check if the uploaded file is present
