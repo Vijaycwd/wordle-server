@@ -59,8 +59,7 @@ app.use('/files', filesdata);
 
 app.set('view engine', 'ejs')
 
-// Serve static files from the 'public' directory
-app.use('/public', express.static(path.join(__dirname, 'public')));
+
 
 const storage = multer.diskStorage({
   destination: function(req, file, cb) {
