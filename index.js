@@ -73,7 +73,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 // Endpoint for uploading images
-app.post('/upload', upload.single('image'), (req, res) => {
+app.post('/upload', upload.single('avatar'), (req, res) => {
   res.json({
     message: 'Image uploaded successfully',
     imageUrl: `https://wordle-server-nta6.onrender.com/public/uploads/${req.file.originalname}`, // Change this to your backend URL
