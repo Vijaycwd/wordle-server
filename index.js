@@ -61,24 +61,4 @@ app.set('view engine', 'ejs')
 
 app.use(cors({ origin: 'https://wordle-server-nta6.onrender.com' })); // Change this to your React app URL
 
-// Set up Multer storage
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'uploads'); // The directory to save uploaded files
-  },
-  filename: function (req, file, cb) {
-    cb(null, file.originalname); // Preserve original filename
-  },
-});
-
-const upload = multer({ storage: storage });
-// Endpoint for uploading images
-app.post('/upload', upload.single('avatar'), (req, res) => {
-  res.json({
-    message: 'Image uploaded successfully',
-    imageUrl: `https://wordle-server-nta6.onrender.com/public/uploads/${req.file.originalname}`, // Change this to your backend URL
-  });
-});
-
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.listen(port);
