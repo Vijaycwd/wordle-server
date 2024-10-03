@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const app = express();
-const port = 5001;
+
 const multer = require('multer');
 const path = require('path');
 
@@ -60,5 +60,3 @@ app.use('/files', filesdata);
 app.set('view engine', 'ejs')
 
 app.use(cors({ origin: 'https://wordle-server-nta6.onrender.com' })); // Change this to your React app URL
-
-app.listen(port);
