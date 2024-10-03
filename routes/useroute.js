@@ -21,52 +21,45 @@ let userSchema = require('../models/User');
 
 //Register User
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'uploads/') // Path where files will be saved
+  destination: function(req, file, cb) {
+    return cb(null, "public/uploads")
   },
   filename: function (req, file, cb) {
-    cb(null, Date.now() + '-' + file.originalname) // Use a unique filename
+    return cb(null, `${file.originalname}`)
   }
-});
+})
 
 const upload = multer({ storage: storage });
-console.log(upload);
-router.route('/create-user').post(upload.single('avatar'), async (req, res) => {
+
+router.route('/create-user').post(upload.single('avatar'), async (req,res)=> {
+ console.log(req.file);
   try {
-    // Check if the uploaded file is present
-    if (!req.file) {
-      return res.status(400).json("Avatar image not provided");
+    var emailExist = await userSchema.findOne({email:req.body.email});
+    if(emailExist){
+      return res.status(400).json("Email Already Exist");
     }
-
-    console.log("File uploaded:", req.file); // Log the uploaded file data
-
-    // Check if the email already exists
-    const emailExist = await userSchema.findOne({ email: req.body.email });
-    if (emailExist) {
-      return res.status(400).json("Email Already Exists");
+    else{
+     
+      var hash = await bcrypt.hash(req.body.password, 10);
+      
+      const userObject = {
+        username: req.body.username,
+        email: req.body.email,
+        password: hash,
+        avatar: req.file.originalname
+      }
+      console.log(userObject);
+      userSchema.create(userObject)
+      .then(users => res.json(users))
+      .catch(err => res.json(err))
     }
-
-    // Hash the password
-    const hash = await bcrypt.hash(req.body.password, 10);
-
-    // Create the user object, use req.file.path for the stored file path
-    const userObject = {
-      username: req.body.username,
-      email: req.body.email,
-      password: hash,
-      avatar: req.file.path // Store the path of the uploaded file
-    };
-
-    console.log("User object:", userObject); // Log the user object
-
-    // Save the user to the database
-    const newUser = await userSchema.create(userObject);
-    return res.status(201).json(newUser);
+    /*userSchema.create(req.body)
+    .then(users => res.json(users))
+    .catch(err => res.json(err))*/
   } catch (error) {
-    console.error("Error creating user:", error); // Log the error for debugging
-    res.status(400).json({ error: "User creation failed", details: error.message });
+    res.status(400).json(error);
   }
-});
+})
 
 
 //get user list
