@@ -57,6 +57,8 @@ app.use('/use', userdata);
 
 app.use('/files', filesdata);
 
+app.use('/uploads', express.static('uploads'));
+
 app.set('view engine', 'ejs')
 
 // Serve static files from the 'public' directory
