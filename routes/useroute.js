@@ -22,12 +22,13 @@ let userSchema = require('../models/User');
 //Register User
 const storage = multer.diskStorage({
   destination: function(req, file, cb) {
-    return cb(null, "https://wordle-server-nta6.onrender.com/public/uploads")
+    return cb(null, "public/uploads")
   },
   filename: function (req, file, cb) {
     return cb(null, `${file.originalname}`)
   }
 })
+
 
 const upload = multer({ storage: storage });
 

@@ -59,25 +59,26 @@ app.use('/files', filesdata);
 
 app.set('view engine', 'ejs')
 
+app.use(cors({ origin: 'https://wordle-server-nta6.onrender.com' })); // Change this to your React app URL
 
-
+// Set up Multer storage
 const storage = multer.diskStorage({
-  destination: function(req, file, cb) {
-    return cb(null, "uploads")
+  destination: function (req, file, cb) {
+    cb(null, 'uploads'); // The directory to save uploaded files
   },
   filename: function (req, file, cb) {
-    return cb(null, `${Date.now()}_${file.originalname}`)
-  }
-})
+    cb(null, file.originalname); // Preserve original filename
+  },
+});
 
-const upload = multer({storage})
+const upload = multer({ storage: storage });
+// Endpoint for uploading images
+app.post('/upload', upload.single('image'), (req, res) => {
+  res.json({
+    message: 'Image uploaded successfully',
+    imageUrl: `https://wordle-server-nta6.onrender.com/public/uploads/${req.file.originalname}`, // Change this to your backend URL
+  });
+});
 
-app.post('/upload', upload.single('file'), (req, res) => {
-  console.log(req.body)
-  console.log(req.file)
-})
-
-
-
-
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.listen(port);
