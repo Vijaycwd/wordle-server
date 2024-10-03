@@ -18,7 +18,8 @@ let userSchema = require('../models/User');
 //put endpoint 
 //localhost:3000/create-user
 //post user
-
+var host = req.get('host');
+console.log("Host",host);
 //Register User
 const storage = multer.diskStorage({
   destination: function(req, file, cb) {
