@@ -22,7 +22,7 @@ let userSchema = require('../models/User');
 //Register User
 const storage = multer.diskStorage({
   destination: function(req, file, cb) {
-    return cb(null, "public/uploads")
+    return cb(null, "https://wordle-server-nta6.onrender.com/public/uploads")
   },
   filename: function (req, file, cb) {
     return cb(null, `${file.originalname}`)
@@ -32,9 +32,6 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 router.route('/create-user').post(upload.single('avatar'), async (req,res)=> {
- const baseUrl = `${req.protocol}/public/uploads/uploads/`;
- const fileUrl = `${baseUrl}${req.file.originalname}`;
- console.log('Baseurl', baseUrl);
   try {
     var emailExist = await userSchema.findOne({email:req.body.email});
     if(emailExist){
