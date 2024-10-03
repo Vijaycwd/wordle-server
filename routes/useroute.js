@@ -2,7 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const multer = require('multer');
 const mongoose = require('mongoose');
-
+const path = require('path');
 //create tokem
 const jwt = require('jsonwebtoken');
 
@@ -20,14 +20,18 @@ let userSchema = require('../models/User');
 //post user
 
 //Register User
+// Configure multer for file storage
+console.log('Backend Path:',path);
 const storage = multer.diskStorage({
   destination: function(req, file, cb) {
-    return cb(null, "public/uploads")
+    // Update to your desired upload directory
+    const uploadPath = path.join(__dirname, 'public/uploads'); // Ensure this folder exists
+    cb(null, uploadPath);
   },
   filename: function (req, file, cb) {
-    return cb(null, `${file.originalname}`)
+    cb(null, file.originalname); // Store the original filename
   }
-})
+});
 
 const upload = multer({ storage: storage });
 
