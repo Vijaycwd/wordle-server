@@ -18,8 +18,7 @@ let userSchema = require('../models/User');
 //put endpoint 
 //localhost:3000/create-user
 //post user
-var host = req.get('host');
-console.log("Host",host);
+
 //Register User
 const storage = multer.diskStorage({
   destination: function(req, file, cb) {
@@ -33,7 +32,9 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 router.route('/create-user').post(upload.single('avatar'), async (req,res)=> {
- console.log(req.file);
+ const baseUrl = `${req.protocol}/public/uploads/uploads/`;
+ const fileUrl = `${baseUrl}${req.file.originalname}`;
+ console.log('Baseurl', baseUrl);
   try {
     var emailExist = await userSchema.findOne({email:req.body.email});
     if(emailExist){
@@ -47,7 +48,7 @@ router.route('/create-user').post(upload.single('avatar'), async (req,res)=> {
         username: req.body.username,
         email: req.body.email,
         password: hash,
-        avatar: req.file.originalname
+        avatar: fileUrl
       }
       console.log(userObject);
       userSchema.create(userObject)
