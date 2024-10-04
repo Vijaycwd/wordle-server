@@ -161,7 +161,6 @@ router.route('/:id').put(upload.single('avatar'), async (req, res) => {
 
 
 //Reset Password
-
 router.route('/reset-password').post(async (req,res)=> {
   try {
     const userData = await userSchema.findOne({email:req.body.email});
