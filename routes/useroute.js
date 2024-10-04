@@ -45,42 +45,36 @@ const upload = multer({
 });
 
 
-router.route('/create-user').post((req, res, next) => {
-  upload.single('avatar')(req, res, (err) => {
-    if (err) {
-      console.error("Multer Error:", err);
-      return res.status(400).json({ message: err.message || "Multer error occurred" });
-    }
-
-    next(); // Call the next middleware after multer
-  });
-}, async (req, res) => {
-  console.log("Response", req);
-  console.log("File Info:", req.file); // Log file details
-
+router.route('/create-user').post(upload.single('avatar'), async (req,res)=> {
+  console.log("response", req);
+  console.log("Baseurl for Backend", req.header.port);
   try {
-    var emailExist = await userSchema.findOne({ email: req.body.email });
-    if (emailExist) {
-      return res.status(400).json("Email Already Exists");
-    } else {
+    var emailExist = await userSchema.findOne({email:req.body.email});
+    if(emailExist){
+      return res.status(400).json("Email Already Exist");
+    }
+    else{
+     
       var hash = await bcrypt.hash(req.body.password, 10);
       
       const userObject = {
         username: req.body.username,
         email: req.body.email,
         password: hash,
-        avatar: req.file ? req.file.originalname : ''
-      };
-
-      console.log("User Object:", userObject);
+        avatar: req.file.originalname
+      }
+      console.log(userObject);
       userSchema.create(userObject)
-        .then(users => res.json(users))
-        .catch(err => res.status(400).json(err));
+      .then(users => res.json(users))
+      .catch(err => res.json(err))
     }
+    /*userSchema.create(req.body)
+    .then(users => res.json(users))
+    .catch(err => res.json(err))*/
   } catch (error) {
     res.status(400).json(error);
   }
-});
+})
 
 
 //get user list
