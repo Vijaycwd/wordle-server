@@ -2,7 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const multer = require('multer');
 const mongoose = require('mongoose');
-const path = require('path');
+
 //create tokem
 const jwt = require('jsonwebtoken');
 
@@ -15,46 +15,22 @@ router = express.Router();
 
 let userSchema = require('../models/User');
 
+//put endpoint 
+//localhost:3000/create-user
+//post user
 
-const fs = require('fs');
-const uploadPath = path.join(__dirname, '../public/uploads');
-
-// Create directory if it doesn't exist
-if (!fs.existsSync(uploadPath)) {
-  fs.mkdirSync(uploadPath, { recursive: true });
-}
-else{
-  console.log('path is Found');
-}
-// Configure multer storage
+//Register User
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    console.log("Destination Path:", path.join(__dirname, 'public/uploads'));
-    cb(null, path.join(__dirname, 'public/uploads'));
+  destination: function(req, file, cb) {
+    return cb(null, "public/uploads")
   },
   filename: function (req, file, cb) {
-    console.log("File received:", file.originalname);
-    cb(null, `${file.originalname}`);
+    return cb(null, `${file.originalname}`)
   }
-});
+})
 
-// Multer middleware setup
-const upload = multer({ 
-  storage: storage,
-  limits: { fileSize: 1024 * 1024 * 5 }, // Set file size limit (e.g., 5MB)
-  fileFilter: function (req, file, cb) {
-    const fileTypes = /jpeg|jpg|png|gif/;
-    const extname = fileTypes.test(path.extname(file.originalname).toLowerCase());
-    const mimetype = fileTypes.test(file.mimetype);
-    
-    if (extname && mimetype) {
-      return cb(null, true);
-    } else {
-      cb('Error: Images Only!');
-    }
-  }
-});
 
+const upload = multer({ storage: storage });
 
 router.route('/create-user').post(upload.single('avatar'), async (req,res)=> {
   console.log("response", req);
