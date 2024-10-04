@@ -2,7 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const multer = require('multer');
 const mongoose = require('mongoose');
-
+const path = require('path');
 //create tokem
 const jwt = require('jsonwebtoken');
 
@@ -15,53 +15,72 @@ router = express.Router();
 
 let userSchema = require('../models/User');
 
-//put endpoint 
-//localhost:3000/create-user
-//post user
-
-//Register User
+// Configure multer storage
 const storage = multer.diskStorage({
-  destination: function(req, file, cb) {
-    return cb(null, "public/uploads")
+  destination: function (req, file, cb) {
+    console.log("Destination Path:", path.join(__dirname, 'public/uploads'));
+    cb(null, path.join(__dirname, 'public/uploads'));
   },
   filename: function (req, file, cb) {
-    return cb(null, `${file.originalname}`)
+    console.log("File received:", file.originalname);
+    cb(null, `${file.originalname}`);
   }
-})
+});
 
-
-const upload = multer({ storage: storage });
-
-router.route('/create-user').post(upload.single('avatar'), async (req,res)=> {
-  console.log("response", req);
-  console.log("Baseurl for Backend", req.header.port);
-  try {
-    var emailExist = await userSchema.findOne({email:req.body.email});
-    if(emailExist){
-      return res.status(400).json("Email Already Exist");
+// Multer middleware setup
+const upload = multer({ 
+  storage: storage,
+  limits: { fileSize: 1024 * 1024 * 5 }, // Set file size limit (e.g., 5MB)
+  fileFilter: function (req, file, cb) {
+    const fileTypes = /jpeg|jpg|png|gif/;
+    const extname = fileTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = fileTypes.test(file.mimetype);
+    
+    if (extname && mimetype) {
+      return cb(null, true);
+    } else {
+      cb('Error: Images Only!');
     }
-    else{
-     
+  }
+});
+
+
+router.route('/create-user').post((req, res, next) => {
+  upload.single('avatar')(req, res, (err) => {
+    if (err) {
+      console.error("Multer Error:", err);
+      return res.status(400).json({ message: err.message || "Multer error occurred" });
+    }
+
+    next(); // Call the next middleware after multer
+  });
+}, async (req, res) => {
+  console.log("Response", req);
+  console.log("File Info:", req.file); // Log file details
+
+  try {
+    var emailExist = await userSchema.findOne({ email: req.body.email });
+    if (emailExist) {
+      return res.status(400).json("Email Already Exists");
+    } else {
       var hash = await bcrypt.hash(req.body.password, 10);
       
       const userObject = {
         username: req.body.username,
         email: req.body.email,
         password: hash,
-        avatar: req.file.originalname
-      }
-      console.log(userObject);
+        avatar: req.file ? req.file.originalname : ''
+      };
+
+      console.log("User Object:", userObject);
       userSchema.create(userObject)
-      .then(users => res.json(users))
-      .catch(err => res.json(err))
+        .then(users => res.json(users))
+        .catch(err => res.status(400).json(err));
     }
-    /*userSchema.create(req.body)
-    .then(users => res.json(users))
-    .catch(err => res.json(err))*/
   } catch (error) {
     res.status(400).json(error);
   }
-})
+});
 
 
 //get user list
