@@ -15,6 +15,17 @@ router = express.Router();
 
 let userSchema = require('../models/User');
 
+
+const fs = require('fs');
+const uploadPath = path.join(__dirname, '../public/uploads');
+
+// Create directory if it doesn't exist
+if (!fs.existsSync(uploadPath)) {
+  fs.mkdirSync(uploadPath, { recursive: true });
+}
+else{
+  console.log('path is Found');
+}
 // Configure multer storage
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
