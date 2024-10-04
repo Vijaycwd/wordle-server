@@ -33,6 +33,8 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 router.route('/create-user').post(upload.single('avatar'), async (req,res)=> {
+  console.log("response", req);
+  console.log("Baseurl for Backend", req.header.port);
   try {
     var emailExist = await userSchema.findOne({email:req.body.email});
     if(emailExist){
