@@ -145,6 +145,9 @@ router.route('/:id').put(upload.single('avatar'), async (req, res) => {
       if (existingUser && existingUser._id.toString() !== userId) {
         return res.status(400).json({ message: 'Email already in use by another user' });
       }
+      else{
+        return res.status(400).json({ message: 'Email not changed one' });
+      }
     }
     // Check if the password is being updated
     if (userData.password) {
