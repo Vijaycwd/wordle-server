@@ -146,7 +146,7 @@ router.route('/:id').put(upload.single('avatar'), async (req, res) => {
         return res.status(400).json({ message: 'Email already in use by another user' });
       }
       else{
-        return res.status(400).json({ message: 'Email not changed one' });
+        return res.status(400).json({ message: 'You cannot change the email address' });
       }
     }
     // Check if the password is being updated
