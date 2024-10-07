@@ -135,21 +135,28 @@ router.route('/:id').delete(async (req, res) => {
 router.route('/:id').put(upload.single('avatar'), async (req, res) => {
   const userId = req.params.id;
   try {
-    const { username, password, avatar } = req.body;
+    const { username, password } = req.body; // Removed avatar from destructuring
+    const updateData = { username }; // Initialize updateData with username
+
     if (password) {
       // Hash the new password before updating
-      const hash = await bcrypt.hash(userData.password, 10);
-      userData.password = hash;
+      const hash = await bcrypt.hash(password, 10);
+      updateData.password = hash; // Add hashed password to updateData
     }
-    if(avatar){
-      console.log('Avatar Location',req.file.originalname);
+
+    // Check if a file is uploaded for avatar, then add avatar to the update
+    if (req.file) {
+      console.log('Avatar Location', req.file.originalname);
+      updateData.avatar = req.file.originalname;
     }
-    // Update the user with the new data
+
+    // Update the user with the new data (only username, password, and avatar if provided)
     const updatedUser = await userSchema.findByIdAndUpdate(
       userId,
-        { username, password, avatar:req.file.originalname },
-        { new: true, runValidators: true }
+      updateData, // Only update fields that are included in updateData
+      { new: true, runValidators: true }
     );
+
     if (!updatedUser) {
       return res.status(404).json({ message: 'User not found' });
     }
@@ -159,6 +166,7 @@ router.route('/:id').put(upload.single('avatar'), async (req, res) => {
     res.status(500).json({ error: 'An error occurred while updating the user' });
   }
 });
+
 
 
 //Reset Password
