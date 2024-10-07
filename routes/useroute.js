@@ -27,7 +27,7 @@ const storage = multer.diskStorage({
   destination: function(req, file, cb) {
     // Use an absolute path for the uploads directory
     const uploadPath = path.join(__dirname, '../public/uploads');
-    console.log("Resolved Upload Path:", uploadPath); // Log the path
+    // console.log("Resolved Upload Path:", uploadPath); // Log the path
     cb(null, uploadPath);
   },
   filename: function (req, file, cb) {
@@ -38,7 +38,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 router.route('/create-user').post(upload.single('avatar'), async (req,res)=> {
-  console.log(req.file.originalname);
+  // console.log(req.file.originalname);
   try {
     var emailExist = await userSchema.findOne({email:req.body.email});
     if(emailExist){
@@ -135,7 +135,7 @@ router.route('/:id').put(upload.single('avatar'), async (req, res) => {
   const userId = req.params.id;
   try {
     const userData = req.body;
-
+    console.log('Updated Data:', userData);
     // Check if the email is being updated
     if (userData.email) {
       const existingUser = await userSchema.findOne({ email: userData.email });
@@ -178,8 +178,6 @@ router.route('/reset-password').post(async (req,res)=> {
     }
     const userToken = await jwt.sign({email:userData.email},'coralWeb', {expiresIn:"5m"});
     const emailLink = `https://vite-wordle-frontend.onrender.com/reset-password/${userData._id}/${userToken}`;
-    console.log(userData.email);
-    console.log(userData.password);
     var transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
@@ -197,12 +195,12 @@ router.route('/reset-password').post(async (req,res)=> {
     
     transporter.sendMail(mailOptions, function(error, info){
       if (error) {
-        console.log(error);
+        // console.log(error);
       } else {
         console.log('Email sent: ' + info.response);
       }
     });
-    console.log(emailLink);
+    // console.log(emailLink);
 
   } catch (error) {
     
