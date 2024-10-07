@@ -140,13 +140,13 @@ router.route('/:id').put(upload.single('avatar'), async (req, res) => {
     if (userData.email) {
       const existingUser = await userSchema.findOne({ email: userData.email });
 
-      // If another user already exists with the new email, prevent the update
-      if (existingUser && existingUser._id.toString() !== userId) {
-        return res.status(400).json({ message: 'Email already in use by another user' });
-      }
-      else{
-        return res.status(400).json({ message: 'You cannot change the email address' });
-      }
+      // // If another user already exists with the new email, prevent the update
+      // if (existingUser && existingUser._id.toString() !== userId) {
+      //   return res.status(400).json({ message: 'Email already in use by another user' });
+      // }
+      // else{
+      //   return res.status(400).json({ message: 'You cannot change the email address' });
+      // }
     }
     // Check if the password is being updated
     if (userData.password) {
