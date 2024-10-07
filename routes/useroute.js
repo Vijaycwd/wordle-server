@@ -142,7 +142,7 @@ router.route('/:id').put(upload.single('avatar'), async (req, res) => {
     }
 
     // Update the user with the new data
-    const updatedUser = await User.findByIdAndUpdate(
+    const updatedUser = await userSchema.findByIdAndUpdate(
       userId,
         { username, password, avatar },
         { new: true, runValidators: true }
