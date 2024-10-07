@@ -134,30 +134,19 @@ router.route('/:id').delete(async (req, res) => {
 router.route('/:id').put(upload.single('avatar'), async (req, res) => {
   const userId = req.params.id;
   try {
-    const userData = req.body;
-    console.log('Updated Data:', userData);
-    // Check if the email is being updated
-    if (userData.email) {
-      const existingUser = await userSchema.findOne({ email: userData.email });
-
-      // // If another user already exists with the new email, prevent the update
-      // if (existingUser && existingUser._id.toString() !== userId) {
-      //   return res.status(400).json({ message: 'Email already in use by another user' });
-      // }
-      // else{
-      //   return res.status(400).json({ message: 'You cannot change the email address' });
-      // }
-    }
-    // Check if the password is being updated
-    if (userData.password) {
+    const { username, password, avatar } = req.body;
+    if (password) {
       // Hash the new password before updating
       const hash = await bcrypt.hash(userData.password, 10);
       userData.password = hash;
     }
 
     // Update the user with the new data
-    const updatedUser = await userSchema.findByIdAndUpdate(userId, userData, { new: true });
-
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+        { username, password, avatar },
+        { new: true, runValidators: true }
+    );
     if (!updatedUser) {
       return res.status(404).json({ message: 'User not found' });
     }
