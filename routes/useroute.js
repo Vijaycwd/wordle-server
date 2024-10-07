@@ -156,7 +156,10 @@ router.route('/:id').put(upload.single('avatar'), async (req, res) => {
     }
 
     // Update the user with the new data
-    const updatedUser = await userSchema.findByIdAndUpdate(userId, userData, { new: true });
+    const updatedUser = await userSchema.findByIdAndUpdate(userId, {
+      ...userData,
+      email: existingUser.email // Keep email constant
+    }, { new: true });
 
     if (!updatedUser) {
       return res.status(404).json({ message: 'User not found' });
