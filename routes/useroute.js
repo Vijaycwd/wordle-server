@@ -119,6 +119,7 @@ router.route('/getuser').get(validUser, async (req,res) =>{
 //loca:500/emp
 router.route('/:id').delete(async (req, res) => {
   const userId = req.params.id;
+  console.log(req.file.originalname);
   try {
     const deleteduser = await userSchema.findByIdAndDelete(userId);
     if (!deleteduser) {
@@ -140,11 +141,13 @@ router.route('/:id').put(upload.single('avatar'), async (req, res) => {
       const hash = await bcrypt.hash(userData.password, 10);
       userData.password = hash;
     }
-
+    if(avatar){
+      console.log('Avatar Location',req.file.originalname);
+    }
     // Update the user with the new data
     const updatedUser = await userSchema.findByIdAndUpdate(
       userId,
-        { username, password, avatar },
+        { username, password, avatar:req.file.originalname },
         { new: true, runValidators: true }
     );
     if (!updatedUser) {
