@@ -38,7 +38,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 router.route('/create-user').post(upload.single('avatar'), async (req,res)=> {
-  // console.log(req.file.originalname);
+  console.log(req.file.originalname);
   try {
     var emailExist = await userSchema.findOne({email:req.body.email});
     if(emailExist){
@@ -138,14 +138,16 @@ router.route('/:id').put(upload.single('avatar'), async (req, res) => {
     console.log('Updated Data:', userData);
     // Check if the email is being updated
     if (userData.email) {
-      
+      const existingUser = await userSchema.findOne({ email: userData.email });
 
       // If another user already exists with the new email, prevent the update
       if (existingUser && existingUser._id.toString() !== userId) {
         return res.status(400).json({ message: 'Email already in use by another user' });
       }
+      else{
+        return res.status(400).json({ message: 'You cannot change the email address' });
+      }
     }
-    const existingUser = await userSchema.findOne({ email: userData.email });
     // Check if the password is being updated
     if (userData.password) {
       // Hash the new password before updating
@@ -154,10 +156,7 @@ router.route('/:id').put(upload.single('avatar'), async (req, res) => {
     }
 
     // Update the user with the new data
-    const updatedUser = await userSchema.findByIdAndUpdate(userId, {
-      ...userData,
-      email: existingUser.email // Keep email constant
-    }, { new: true });
+    const updatedUser = await userSchema.findByIdAndUpdate(userId, userData, { new: true });
 
     if (!updatedUser) {
       return res.status(404).json({ message: 'User not found' });
