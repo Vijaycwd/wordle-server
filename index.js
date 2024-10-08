@@ -14,8 +14,7 @@ app.use(express.json());
 app.use(morgan('dev'));
 
 // Static files
-app.use('/public', express.static(path.join(__dirname, 'public')));
-
+app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 // MongoDB connection
 const uri = 'mongodb+srv://admin:fCSRvxosWWKRgzYK@cluster0.npxurqz.mongodb.net/Wordlegame?retryWrites=true&w=majority';
 mongoose.connect(uri)
