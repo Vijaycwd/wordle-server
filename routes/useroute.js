@@ -31,6 +31,7 @@ const storage = multer.diskStorage({
     // Use an absolute path for the uploads directory
     //const uploadPath = path.join(__dirname, '../public/uploads');
     // console.log("Resolved Upload Path:", uploadPath); // Log the path
+    const uploadPath = path.join(__dirname, '../public/uploads');
     cb(null, uploadPath);
   },
   filename: function (req, file, cb) {
