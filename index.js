@@ -61,6 +61,7 @@ app.use('/files', filesdata);
 
 app.set('view engine', 'ejs')
 
-app.use(cors({ origin: 'https://wordle-server-nta6.onrender.com' })); // Change this to your React app URL
-app.use(express.static('public'));
+app.use('/public', express.static(path.join(__dirname, 'public')));
+console.log(path.join(__dirname, 'public/uploads/User_icon.png'));
+
 app.listen(port);
