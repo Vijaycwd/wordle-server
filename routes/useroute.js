@@ -2,7 +2,6 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const multer = require('multer');
 const mongoose = require('mongoose');
-const fs = require('fs');
 //create tokem
 const jwt = require('jsonwebtoken');
 
@@ -24,9 +23,9 @@ const path = require('path');
 
 // Ensure uploads directory exists
 const uploadPath = path.join(__dirname, '/public/uploads');
-if (!fs.existsSync(uploadPath)) {
-  fs.mkdirSync(uploadPath);
-}
+// if (!fs.existsSync(uploadPath)) {
+//   fs.mkdirSync(uploadPath);
+// }
 
 // Configure multer storage with absolute path
 const storage = multer.diskStorage({
