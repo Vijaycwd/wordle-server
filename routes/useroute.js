@@ -23,7 +23,9 @@ const path = require('path');
 
 console.log(path.join(__dirname));
 // Ensure uploads directory exists
-const uploadPath = path.join(__dirname, '/public/uploads/');
+const uploadPath = path.join(__dirname, '../public/uploads/');
+
+console.log(uploadPath);
 // if (!fs.existsSync(uploadPath)) {
 //   fs.mkdirSync(uploadPath);
 // }
