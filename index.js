@@ -4,45 +4,31 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const app = express();
-
-const multer = require('multer');
 const path = require('path');
-
 const port = 5001;
 
-//Express Data
-
-const wordledata = require('./routes/wordlescores');
-const userdata = require('./routes/useroute');
-const filesdata = require('./routes/filesroute')
-const wordlegamestat = require('./routes/wordlegamestats');
-
-
-
-//Middleware
-
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({
-  extended:true
-}))
+// Middleware
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(express.static('public'));
 app.use(morgan('dev'));
 
+// Static files
+app.use('/public', express.static(path.join(__dirname, 'public')));
 
+// MongoDB connection
 const uri = 'mongodb+srv://admin:fCSRvxosWWKRgzYK@cluster0.npxurqz.mongodb.net/Wordlegame?retryWrites=true&w=majority';
 mongoose.connect(uri)
-.then(() =>console.log('connected successfully'))
-.catch((err) => {console.error(err);})
+  .then(() => console.log('Connected successfully'))
+  .catch((err) => { console.error(err); });
+
 const connection = mongoose.connection;
-connection.once('open',()=>{
+connection.once('open', () => {
   console.log("Mongoose database Connected Successfully");
-})
+});
 
-
-//apply cors
+// CORS setup
 app.use(cors());
-
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Methods", "GET, PUT, POST");
@@ -50,19 +36,20 @@ app.use(function(req, res, next) {
   next();
 });
 
-//localhost:5001/emp/create-employee-> frontend entpoint
+// Routes
+const wordledata = require('./routes/wordlescores');
+const userdata = require('./routes/useroute');
+const filesdata = require('./routes/filesroute');
+const wordlegamestat = require('./routes/wordlegamestats');
+
 app.use('/wordle', wordledata);
-
 app.use('/wordle-game-stats', wordlegamestat);
-
 app.use('/use', userdata);
-
 app.use('/files', filesdata);
 
-app.set('view engine', 'ejs')
+app.set('view engine', 'ejs');
 
-app.use('/public', express.static(path.join(__dirname, 'public')));
-
-console.log(path.join(__dirname, 'public/uploads/User_icon.png'));
-
-app.listen(port);
+// Start server
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
+});
