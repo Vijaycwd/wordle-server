@@ -7,6 +7,7 @@ const jwt = require('jsonwebtoken');
 
 var nodemailer = require('nodemailer');
 
+const fs = require('fs');
 
 router = express.Router();
 
