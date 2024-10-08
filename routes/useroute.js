@@ -22,11 +22,17 @@ let userSchema = require('../models/User');
 //Register User
 const path = require('path');
 
+// Ensure uploads directory exists
+const uploadPath = path.join(__dirname, '../public/uploads');
+if (!fs.existsSync(uploadPath)) {
+  fs.mkdirSync(uploadPath);
+}
+
 // Configure multer storage with absolute path
 const storage = multer.diskStorage({
   destination: function(req, file, cb) {
     // Use an absolute path for the uploads directory
-    const uploadPath = path.join(__dirname, '../public/uploads');
+    //const uploadPath = path.join(__dirname, '../public/uploads');
     // console.log("Resolved Upload Path:", uploadPath); // Log the path
     cb(null, uploadPath);
   },
