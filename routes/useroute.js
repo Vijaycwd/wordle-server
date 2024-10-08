@@ -24,12 +24,12 @@ const path = require('path');
 
 console.log(path.join(__dirname));
 // Ensure uploads directory exists
-const uploadPath = path.join(__dirname, './../public/uploads/');
+const uploadPath = path.join(__dirname, '/../public/uploads/');
 
 console.log(uploadPath);
-if (!fs.existsSync(uploadPath)) {
-  fs.mkdirSync(uploadPath);
-}
+// if (!fs.existsSync(uploadPath)) {
+//   fs.mkdirSync(uploadPath);
+// }
 
 // Configure multer storage with absolute path
 const storage = multer.diskStorage({
