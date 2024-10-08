@@ -23,7 +23,7 @@ let userSchema = require('../models/User');
 const path = require('path');
 
 // Ensure uploads directory exists
-const uploadPath = path.join(__dirname, '../public/uploads');
+const uploadPath = path.join(__dirname, '/public/uploads');
 if (!fs.existsSync(uploadPath)) {
   fs.mkdirSync(uploadPath);
 }
