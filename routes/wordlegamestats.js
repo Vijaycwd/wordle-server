@@ -6,7 +6,7 @@ const wordlegamestatSchema = require('../models/WordleGameStats');
 router.post('/create-stats', async (req, res) => {
     // console.log(req.body);
     try {
-        const { username, useremail, totalGamesPlayed, totalWinGames, currentStreak, maxStreak, lastgameisWin } = req.body;
+        const { username, useremail, totalGamesPlayed, totalWinGames, currentStreak, maxStreak, guessDistribution, lastgameisWin } = req.body;
 
         // Check if the user already exists
         const existingStats = await wordlegamestatSchema.findOne({ useremail });
@@ -22,7 +22,8 @@ router.post('/create-stats', async (req, res) => {
             totalWinGames,
             currentStreak,
             maxStreak, // Initialize maxStreak with the currentStreak
-            lastgameisWin:'false'
+            guessDistribution,
+            lastgameisWin
         });
 
         // Save the new stats document to the database
@@ -38,7 +39,7 @@ router.post('/create-stats', async (req, res) => {
 // Update Wordle game statistics
 router.post('/update', async (req, res) => {
     try {
-        const { username, useremail, totalWinGames, lastgameisWin } = req.body;
+        const { username, useremail, totalWinGames, guessDistribution, lastgameisWin,  } = req.body;
 
         console.log(req.body);
 

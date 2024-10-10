@@ -29,6 +29,10 @@ const WordleStatsSchema  = new Schema ({
         type: Number,
         default: 0,
     },
+    guessDistribution: {
+        type: [Number], // Array of numbers representing guess distribution
+        default: [0, 0, 0, 0, 0, 0], // Default value for 6 guesses
+    }
 
 },{
     collection: 'WordleStats',
