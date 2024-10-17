@@ -40,9 +40,11 @@ const wordledata = require('./routes/wordlescores');
 const userdata = require('./routes/useroute');
 const filesdata = require('./routes/filesroute');
 const wordlegamestat = require('./routes/wordlegamestats');
+const connectiondata = require('./routes/connectionsscores');
 
 app.use('/wordle', wordledata);
 app.use('/wordle-game-stats', wordlegamestat);
+app.use('/connections', connectiondata);
 app.use('/use', userdata);
 app.use('/files', filesdata);
 
